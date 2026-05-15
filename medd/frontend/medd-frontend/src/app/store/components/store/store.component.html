@@ -1,9 +1,12 @@
 <div class="store-container">
   <header>
     <h1>Аптека MedD</h1>
-    <button class="cart-btn" (click)="showCart = !showCart">
-      🛒 Корзина ({{ cartItems.length }})
-    </button>
+    <div class="header-links">
+      <a routerLink="/admin" class="admin-link">📋 Админка</a>
+      <button class="cart-btn" (click)="showCart = !showCart">
+        🛒 Корзина ({{ cartItems.length }})
+      </button>
+    </div>
   </header>
 
   <div *ngIf="isLoading" class="loading">

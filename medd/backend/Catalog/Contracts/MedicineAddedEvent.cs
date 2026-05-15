@@ -1,4 +1,4 @@
-﻿namespace Catalog.Contracts;
+﻿namespace Order.Contracts;
 
 public class MedicineAddedEvent
 {

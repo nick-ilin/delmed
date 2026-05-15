@@ -1,4 +1,4 @@
-﻿using Catalog.Contracts;
+﻿using Order.Contracts;
 using Catalog.Infrastructure.Data;
 using Catalog.Infrastructure.Entities;
 using MassTransit;
@@ -15,7 +15,9 @@ public class CreateMedicineCommandHandler(CatalogDbContext context, IPublishEndp
             .Where(m => m.Status != 0)
             .CountAsync(cancellationToken);
 
-        if (totalCount >= 9) throw new Exception("Ограничение на добавление записей в справочник лекарственных средств (9шт). Удалите, чтобы добавить новое или отредактируйте старое.");
+        if (totalCount >= 9)
+            throw new InvalidOperationException(
+                "Ограничение на добавление записей в справочник лекарственных средств (9 шт). Удалите, чтобы добавить новое или отредактируйте старое.");
 
         var medicine = new Medicine
         {

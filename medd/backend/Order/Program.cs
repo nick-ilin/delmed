@@ -51,9 +51,9 @@ builder.Services.AddMassTransit(x =>
 
     x.UsingRabbitMq((context, cfg) =>
     {
-        var host = builder.Environment.IsDevelopment()
-            ? "rabbitmq_medd"
-            : "rabbitmq_medd";
+        var host = Environment.GetEnvironmentVariable("RabbitMQ__Host") ?? "rabbitmq_medd";
+        var username = Environment.GetEnvironmentVariable("RabbitMQ__Username") ?? "guest";
+        var password = Environment.GetEnvironmentVariable("RabbitMQ__Password") ?? "guest";
 
         cfg.Host(host, h =>
         {
@@ -61,9 +61,14 @@ builder.Services.AddMassTransit(x =>
             h.Password("guest");
         });
 
+        // Явно указываем JSON сериализацию
+        cfg.UseNewtonsoftJsonSerializer();
+        cfg.UseNewtonsoftJsonDeserializer();
+
         cfg.ReceiveEndpoint("medicine-added-queue", e =>
         {
             e.ConfigureConsumer<MedicineAddedEventConsumer>(context);
+            e.PrefetchCount = 1;
         });
     });
 });
@@ -72,6 +77,19 @@ var app = builder.Build();
 
 // CORS — используем правильное имя политики
 app.UseCors("AllowFrontend");
+
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (InvalidOperationException ex)
+    {
+        context.Response.StatusCode = 400;
+        await context.Response.WriteAsJsonAsync(new { error = ex.Message });
+    }
+});
 
 // Apply migrations
 using (var scope = app.Services.CreateScope())

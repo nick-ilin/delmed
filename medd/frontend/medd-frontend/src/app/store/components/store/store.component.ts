@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { MedicineCardsComponent } from '../medicine-cards/medicine-cards.component';
 import { CartComponent } from '../cart/cart.component';
 import { OrderService } from '../../../shared/services/order.service';
@@ -10,7 +11,7 @@ import { lastValueFrom } from 'rxjs';
 @Component({
   selector: 'app-store',
   standalone: true,
-  imports: [CommonModule, MedicineCardsComponent, CartComponent],
+  imports: [CommonModule, MedicineCardsComponent, CartComponent, RouterModule],
   templateUrl: './store.component.html',
   styleUrls: ['./store.component.scss']
 })

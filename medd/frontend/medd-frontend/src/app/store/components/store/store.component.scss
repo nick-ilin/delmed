@@ -183,6 +183,25 @@ app-cart {
   cursor: not-allowed;
 }
 
+.header-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.admin-link {
+  padding: 8px 16px;
+  background-color: #6c757d;
+  color: white;
+  text-decoration: none;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+.admin-link:hover {
+  background-color: #5a6268;
+}
+
 @media (max-width: 768px) {
   .content {
     flex-direction: column;
