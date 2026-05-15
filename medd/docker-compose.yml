@@ -1,0 +1,112 @@
+services:
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: rabbitmq_medd
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - medd_network
+      
+  catalog_db:
+    image: postgres:16
+    container_name: catalog_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: catalog_db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5832:5432"
+    volumes:
+      - ./data/catalog_db:/var/lib/postgresql/data  # ← постоянная папка
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - medd_network
+    
+  catalog_api:
+    build:
+      context: ./backend/Catalog
+      dockerfile: Dockerfile
+    container_name: catalog_api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Host=catalog_db;Port=5432;Database=catalog_db;Username=postgres;Password=postgres123
+    ports:
+      - "5001:80"
+    depends_on:
+      catalog_db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - medd_network
+                
+  order_db:
+    image: postgres:16
+    container_name: order_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: order_db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5833:5432"
+    volumes:
+      - ./data/order_db:/var/lib/postgresql/data  # ← постоянная папка
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - medd_network
+    
+  order_api:
+    build:
+      context: ./backend/Order
+      dockerfile: Dockerfile
+    container_name: order_api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Host=order_db;Port=5432;Database=order_db;Username=postgres;Password=postgres123
+    ports:
+      - "5002:80"
+    depends_on:
+      order_db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - medd_network
+
+  catalog_frontend:
+    build:
+      context: ./frontend/medd-frontend
+      dockerfile: Dockerfile
+    container_name: catalog_frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - catalog_api
+    networks:
+      - medd_network
+
+networks:
+  medd_network:
+    driver: bridge

@@ -1,0 +1,27 @@
+<div class="cart">
+  <h2>Корзина</h2>
+
+  <div *ngIf="items.length === 0" class="empty-cart">
+    Корзина пуста
+  </div>
+
+  <div *ngIf="items.length > 0">
+    <div class="cart-items">
+      <div *ngFor="let item of items" class="cart-item">
+        <div class="item-info">
+          <span class="item-name">{{ item.name }}</span>
+          <span class="item-price">{{ item.price | currency:'₽' }}</span>
+        </div>
+        <button class="remove-btn" (click)="remove(item.id!)">🗑️</button>
+      </div>
+    </div>
+
+    <div class="cart-total">
+      <strong>Итого:</strong> {{ totalPrice | currency:'₽' }}
+    </div>
+
+    <button class="checkout-btn" (click)="onCheckout()" [disabled]="isProcessing">
+      {{ isProcessing ? 'Оформление...' : 'Оформить заказ' }}
+    </button>
+  </div>
+</div>
