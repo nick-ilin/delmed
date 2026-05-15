@@ -1,5 +1,5 @@
 ﻿using MassTransit;
-using Catalog.Contracts;
+using Order.Contracts;
 using Serilog;
 
 namespace Catalog.Infrastructure.Messaging;

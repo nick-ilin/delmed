@@ -18,7 +18,14 @@ export class CatalogService {
   }
 
   createMedicine(data: any): Observable<Medicine> {
-    return this.http.post<Medicine>(this.apiUrl, data);
+    return this.http.post<Medicine>(this.apiUrl, data).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError(error: any) {
+    console.error('API Error:', error);
+    return throwError(() => error);
   }
 
   updateMedicine(id: number, data: any): Observable<Medicine> {

@@ -1,4 +1,4 @@
-﻿using Catalog.Contracts;
+﻿using Order.Contracts;
 using Catalog.Infrastructure.Data;
 using FluentValidation;
 using MassTransit;
@@ -8,7 +8,7 @@ using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// CORS — разрешаем всё для разработки
+// CORS — одна регистрация
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -29,18 +29,6 @@ builder.Host.UseSerilog();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-// CORS
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend", policy =>
-    {
-        policy.WithOrigins("http://localhost:4200")  // URL фронта
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
-    });
-});
 
 // DbContext
 builder.Services.AddDbContext<CatalogDbContext>(options =>

@@ -90,9 +90,10 @@ export class MedicineListComponent implements OnInit {
       }
       await this.loadMedicines();
       this.closeForm();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Save error:', err);
-      alert('Ошибка при сохранении');
+      const errorMessage = err.error?.error || err.message || 'Ошибка при сохранении';
+      alert(errorMessage);
     }
   }
 
