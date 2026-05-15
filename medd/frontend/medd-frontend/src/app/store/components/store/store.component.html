@@ -1,0 +1,71 @@
+<div class="store-container">
+  <header>
+    <h1>Аптека MedD</h1>
+    <button class="cart-btn" (click)="showCart = !showCart">
+      🛒 Корзина ({{ cartItems.length }})
+    </button>
+  </header>
+
+  <div *ngIf="isLoading" class="loading">
+    Загрузка лекарств...
+  </div>
+
+  <div *ngIf="!isLoading && medicines.length > 0" class="content">
+    <app-medicine-cards
+      [medicines]="medicines"
+      (addToCart)="addToCart($event)">
+    </app-medicine-cards>
+
+    <app-cart
+      *ngIf="showCart"
+      [items]="cartItems"
+      [isProcessing]="isProcessing"
+      (removeFromCart)="removeFromCart($event)"
+      (checkout)="checkout()">
+    </app-cart>
+  </div>
+
+  <div *ngIf="!isLoading && medicines.length === 0" class="no-data">
+    Нет доступных лекарств
+  </div>
+
+  <!-- Модальное окно с информацией о заказе -->
+  <div *ngIf="showOrderModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Заказ оформлен!</h2>
+        <button class="close-btn" (click)="closeOrderModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <p><strong>Номер заказа:</strong> {{ orderDetails?.id }}</p>
+        <p><strong>Дата создания:</strong> {{ orderDetails?.createdAt | date:'dd.MM.yyyy HH:mm' }}</p>
+        <p><strong>Статус:</strong>
+          <span [class]="orderDetails?.status === 0 ? 'status-new' : 'status-paid'">
+            {{ orderDetails?.status === 0 ? 'Новый' : 'Оплачен' }}
+          </span>
+        </p>
+        <p><strong>Итого:</strong> {{ orderDetails?.totalPrice | currency:'₽' }}</p>
+
+        <div class="order-items">
+          <h3>Состав заказа:</h3>
+          <div *ngFor="let item of orderDetails?.items" class="order-item">
+            <span>{{ item.medicineName }}</span>
+            <span class="item-total">{{ item.total | currency:'₽' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeOrderModal()">Закрыть</button>
+        <button
+          *ngIf="orderDetails?.status === 0"
+          class="btn-primary"
+          (click)="payOrder()"
+          [disabled]="isProcessing">
+          {{ isProcessing ? 'Обработка...' : 'Оплатить' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

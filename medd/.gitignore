@@ -80,3 +80,4 @@ bld/
 **/Properties/launchSettings.json
 
 # Custom ignore
+/data/

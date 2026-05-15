@@ -1,0 +1,80 @@
+<div class="container">
+  <h1>Управление лекарствами</h1>
+
+  <div class="toolbar">
+    <button (click)="openAddForm()">+ Добавить лекарство</button>
+  </div>
+
+  <ng-container *ngIf="medicines">
+    <div *ngIf="medicines.length === 0" class="no-data">
+      Нет данных. Добавьте первое лекарство.
+    </div>
+
+    <div *ngIf="medicines.length > 0" class="table-container">
+      <table>
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Название</th>
+          <th>Производитель</th>
+          <th>Цена</th>
+          <th>Рецепт</th>
+          <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let item of medicines">
+          <td>{{ item.id }}</td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.manufacturer }}</td>
+          <td>{{ item.price | currency:'₽' }}</td>
+          <td>{{ item.isRequiredPrescription ? 'Да' : 'Нет' }}</td>
+          <td>
+            <button class="edit" (click)="openEditForm(item)">✏️</button>
+            <button class="delete" (click)="deleteMedicine(item.id!)">🗑️</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-container>
+
+  <!-- Форма -->
+  <div *ngIf="showForm" class="form-overlay">
+    <div class="form-card">
+      <h2>{{ isEditMode ? 'Редактирование' : 'Новое лекарство' }}</h2>
+
+      <div class="form-group">
+        <label>Название *</label>
+        <input type="text" [(ngModel)]="formData.name" />
+      </div>
+
+      <div class="form-group">
+        <label>Описание</label>
+        <textarea [(ngModel)]="formData.description" rows="3"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Производитель *</label>
+        <input type="text" [(ngModel)]="formData.manufacturer" />
+      </div>
+
+      <div class="form-group">
+        <label>Цена *</label>
+        <input type="number" [(ngModel)]="formData.price" step="0.01" />
+      </div>
+
+      <div class="form-group checkbox">
+        <label>
+          <input type="checkbox" [(ngModel)]="formData.isRequiredPrescription" />
+          Требуется рецепт
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <button class="cancel" (click)="closeForm()">Отмена</button>
+        <button class="save" (click)="saveMedicine()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
