@@ -59,21 +59,19 @@
 *   **Инфраструктура:** Docker, Docker Compose, Nginx
 
 ## 📁 Структура проекта
-    
+```
 medd/
-├── backend/                # Исходный код бэкенда
-│   ├── Catalog/            # Catalog API (.NET)
-│   ├── Order/              # Order API (.NET)
-│   └── Shared/             # Общие библиотеки
-├── frontend/               # Исходный код фронтенда
-│   └── medd-frontend/      # Angular приложение
-├── data/                   # Persistent volume для баз данных (создаётся автоматически)
-├── docker-compose.yml      # Главный файл оркестрации контейнеров
-└── README.md               # Этот файл
-    
-
+├── backend/ # Исходный код бэкенда
+│ ├── Catalog/ # Catalog API (.NET)
+│ ├── Order/ # Order API (.NET)
+│ └── Shared/ # Общие библиотеки
+├── frontend/ # Исходный код фронтенда
+│ └── medd-frontend/ # Angular приложение
+├── data/ # Persistent volume для баз данных (создаётся автоматически)
+├── docker-compose.yml # Главный файл оркестрации контейнеров
+└── README.md # Этот файл
+```
 ## 👤 Контактная информация
 
 *   **GitHub:** [https://github.com/nick-ilin](https://github.com/nick-ilin)
-*   **Email:** dooomer@mail.ru
-*   **Telegram:** @ilinnick
+*   **Email:** aist1200@mail.ru
