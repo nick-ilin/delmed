@@ -64,7 +64,6 @@ medd/
 ├── backend/ # Исходный код бэкенда
 │ ├── Catalog/ # Catalog API (.NET)
 │ ├── Order/ # Order API (.NET)
-│ └── Shared/ # Общие библиотеки
 ├── frontend/ # Исходный код фронтенда
 │ └── medd-frontend/ # Angular приложение
 ├── data/ # Persistent volume для баз данных (создаётся автоматически)
