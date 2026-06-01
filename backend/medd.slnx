@@ -1,4 +1,6 @@
 <Solution>
+  <Project Path="../tests/Catalog.UnitTests/Catalog.UnitTests.csproj" Id="e80620c2-3cc9-4c63-9ffa-7977580783c3" />
   <Project Path="Catalog/Catalog.csproj" />
   <Project Path="Order/Order.csproj" Id="2843438b-a7e8-49d7-a7d2-ea2b11d3d6fa" />
+  <Project Path="tests/Order.UnitTests/Order.UnitTests.csproj" Id="c6bffe2e-9f90-44e9-9042-154239e2ee97" />
 </Solution>
