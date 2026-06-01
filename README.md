@@ -13,7 +13,6 @@
 1.  **Склонируйте репозиторий:**
         bash
     git clone https://github.com/nick-ilin/delmed.git
-    cd medd
     
 2.  **Запустите все сервисы из корневой директории:**
         bash
@@ -60,7 +59,6 @@
 
 ## 📁 Структура проекта
 ```
-medd/
 ├── backend/ # Исходный код бэкенда
 │ ├── Catalog/ # Catalog API (.NET)
 │ ├── Order/ # Order API (.NET)
