@@ -20,10 +20,13 @@ jobs:
           dotnet-version: '8.0.x'
       
       - name: Restore dependencies
+        working-directory: ./backend
         run: dotnet restore Medd.slnx
       
       - name: Build solution
+        working-directory: ./backend
         run: dotnet build Medd.slnx --no-restore --configuration Release
       
       - name: Run tests
+        working-directory: ./backend
         run: dotnet test Medd.slnx --no-build --configuration Release
