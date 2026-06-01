@@ -15,7 +15,7 @@ public class OrderDbContext(DbContextOptions<OrderDbContext> options) : DbContex
         modelBuilder.ApplyConfiguration(new MedicineConfiguration());
         modelBuilder.ApplyConfiguration(new OrderConfiguration());
         modelBuilder.ApplyConfiguration(new OrderMedicineConfiguration());
-        
+
         base.OnModelCreating(modelBuilder);
     }
 }
