@@ -1,4 +1,4 @@
-name: MedD CI/CD Pipeline
+name: MedD CI/CD
 
 on:
   push:
@@ -7,195 +7,64 @@ on:
     branches: [ main ]
 
 jobs:
-  # ========== 1. BUILD & TEST ==========
+  # 1) Билд и тесты (без внешних сервисов)
   build-and-test:
-    name: Build and Test
+    name: Build & Test
     runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0.x'
-    
-    - name: Restore dependencies
-      run: dotnet restore MedD.sln
-    
-    - name: Build solution
-      run: dotnet build MedD.sln --no-restore --configuration Release
-    
-    - name: Run unit tests
-      run: dotnet test MedD.sln --no-build --configuration Release --filter "Category=Unit"
-    
-    - name: Run integration tests
-      run: dotnet test MedD.sln --no-build --configuration Release --filter "Category=Integration"
-    
-    - name: Upload test results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: test-results
-        path: '**/TestResults/*.trx'
-    
-    # Анализ покрытия кода
-    - name: Install Coverlet
-      run: dotnet tool install --global coverlet.console
-    
-    - name: Run coverage
-      run: dotnet test MedD.sln --collect:"XPlat Code Coverage"
-    
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        files: ./**/coverage.cobertura.xml
-    
-    # Публикация артефактов (DLL)
-    - name: Publish Catalog API
-      run: dotnet publish backend/Catalog/Catalog.csproj -c Release -o ./publish/Catalog
-    
-    - name: Publish Order API
-      run: dotnet publish backend/Order/Order.csproj -c Release -o ./publish/Order
-    
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: medd-build
-        path: ./publish/
 
-  # ========== 2. STATIC ANALYSIS ==========
-  sonar-scan:
-    name: SonarQube Scan
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore MedD.sln
+
+      - name: Build solution
+        run: dotnet build MedD.sln --no-restore --configuration Release
+
+      - name: Run tests
+        run: dotnet test MedD.sln --no-build --configuration Release
+
+  # 2) Проверка форматирования (дополнительная, но полезная)
+  check-formatting:
+    name: Check Formatting
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0.x'
-    
-    - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@v2
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      with:
-        args: >
-          -Dsonar.organization=medd
-          -Dsonar.projectKey=medd
-          -Dsonar.cs.opencover.reportsPaths=**/coverage.opencover.xml
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Check formatting
+        run: dotnet format --verify-no-changes
 
-  # ========== 3. DOCKER BUILD ==========
+  # 3) Сборка Docker-образов (опционально)
   docker-build:
     name: Build Docker Images
     runs-on: ubuntu-latest
     needs: build-and-test
-    if: github.ref == 'refs/heads/main'  # только для main ветки
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-    
-    - name: Log in to GitHub Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Build and push Catalog API
-      uses: docker/build-push-action@v5
-      with:
-        context: ./backend/Catalog
-        push: true
-        tags: |
-          ghcr.io/${{ github.repository }}/catalog-api:latest
-          ghcr.io/${{ github.repository }}/catalog-api:${{ github.sha }}
-    
-    - name: Build and push Order API
-      uses: docker/build-push-action@v5
-      with:
-        context: ./backend/Order
-        push: true
-        tags: |
-          ghcr.io/${{ github.repository }}/order-api:latest
-          ghcr.io/${{ github.repository }}/order-api:${{ github.sha }}
-    
-    - name: Build and push Frontend
-      uses: docker/build-push-action@v5
-      with:
-        context: ./frontend/medd-frontend
-        push: true
-        tags: |
-          ghcr.io/${{ github.repository }}/frontend:latest
-          ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}
-
-  # ========== 4. DOCKER COMPOSE TEST ==========
-  docker-compose-test:
-    name: Test with Docker Compose
-    runs-on: ubuntu-latest
-    needs: docker-build
     if: github.ref == 'refs/heads/main'
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Start services
-      run: docker-compose up -d
-    
-    - name: Wait for services
-      run: sleep 30
-    
-    - name: Health check Catalog API
-      run: curl --fail http://localhost:5001/health || exit 1
-    
-    - name: Health check Order API
-      run: curl --fail http://localhost:5002/health || exit 1
-    
-    - name: Health check Frontend
-      run: curl --fail http://localhost:4200 || exit 1
-    
-    - name: Stop services
-      run: docker-compose down
 
-  # ========== 5. CREATE RELEASE ==========
-  create-release:
-    name: Create Release
-    runs-on: ubuntu-latest
-    needs: [docker-build, docker-compose-test]
-    if: github.ref == 'refs/heads/main'
-    
     steps:
-    - name: Download artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: medd-build
-        
-    - name: Create ZIP
-      run: zip -r medd-release.zip .
-    
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: v${{ github.run_number }}
-        name: Release v${{ github.run_number }}
-        body: |
-          ## MedD Release v${{ github.run_number }}
-          
-          ### Docker Images
-          - Catalog API: `ghcr.io/${{ github.repository }}/catalog-api:${{ github.sha }}`
-          - Order API: `ghcr.io/${{ github.repository }}/order-api:${{ github.sha }}`
-          - Frontend: `ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}`
-          
-          ### Как запустить
-          ```bash
-          docker-compose pull
-          docker-compose up -d
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Catalog API
+        run: docker build -t medd-catalog-api ./backend/Catalog
+
+      - name: Build Order API
+        run: docker build -t medd-order-api ./backend/Order
+
+      - name: Build Frontend
+        run: docker build -t medd-frontend ./frontend/medd-frontend
+
+      - name: Log Docker images
+        run: docker images | grep medd
