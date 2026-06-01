@@ -7,7 +7,7 @@ namespace Catalog.Features.Medicines.Update;
 
 public class UpdateMedicineCommandHandler(CatalogDbContext context) : IRequestHandler<UpdateMedicineCommand, UpdateMedicineResponse?>
 {
-    public async Task<UpdateMedicineResponse?> Handle(UpdateMedicineCommand request, CancellationToken cancellationToken)
+    public async Task<UpdateMedicineResponse> Handle(UpdateMedicineCommand request, CancellationToken cancellationToken)
     {
         var medicine = await context.Medicines
             .FirstOrDefaultAsync(m => m.Id == request.Id, cancellationToken)

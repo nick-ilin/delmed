@@ -7,7 +7,7 @@ namespace Catalog.Features.Medicines.Get;
 
 public class GetMedicineQueryHandler(CatalogDbContext context) : IRequestHandler<GetMedicineQuery, GetMedicineResponse?>
 {
-    public async Task<GetMedicineResponse?> Handle(GetMedicineQuery request, CancellationToken cancellationToken)
+    public async Task<GetMedicineResponse> Handle(GetMedicineQuery request, CancellationToken cancellationToken)
     {
         var medicine = await context.Medicines
             .FirstOrDefaultAsync(m => m.Id == request.Id, cancellationToken)
