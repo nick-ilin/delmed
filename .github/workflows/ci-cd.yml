@@ -22,13 +22,13 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore MedD.sln
+        run: dotnet restore Medd.slnx
 
       - name: Build solution
-        run: dotnet build MedD.sln --no-restore --configuration Release
+        run: dotnet build Medd.slnx --no-restore --configuration Release
 
       - name: Run tests
-        run: dotnet test MedD.sln --no-build --configuration Release
+        run: dotnet test Medd.slnx --no-build --configuration Release
 
   # 2) Проверка форматирования (дополнительная, но полезная)
   check-formatting:
