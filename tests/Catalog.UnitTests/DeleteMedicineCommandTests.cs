@@ -19,7 +19,7 @@ public class DeleteMedicineCommandTests
 
         using var context = new CatalogDbContext(options);
         var medicine = new Medicine
-        { 
+        {
             Id = 1,
             Name = "Аспирин",
             Description = "Описание",
