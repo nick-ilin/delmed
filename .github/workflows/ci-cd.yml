@@ -7,7 +7,6 @@ on:
     branches: [ main ]
 
 jobs:
-  # 1) Билд и тесты (без внешних сервисов)
   build-and-test:
     name: Build & Test
     runs-on: ubuntu-latest
@@ -30,7 +29,6 @@ jobs:
       - name: Run tests
         run: dotnet test Medd.slnx --no-build --configuration Release
 
-  # 2) Проверка форматирования (дополнительная, но полезная)
   check-formatting:
     name: Check Formatting
     runs-on: ubuntu-latest
@@ -43,7 +41,6 @@ jobs:
       - name: Check formatting
         run: dotnet format --verify-no-changes
 
-  # 3) Сборка Docker-образов (опционально)
   docker-build:
     name: Build Docker Images
     runs-on: ubuntu-latest
