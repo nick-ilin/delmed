@@ -10,23 +10,25 @@ jobs:
   build-and-test:
     name: Build & Test
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
+      
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-
+      
       - name: Restore dependencies
+        working-directory: ./backend
         run: dotnet restore Medd.slnx
-
+      
       - name: Build solution
+        working-directory: ./backend
         run: dotnet build Medd.slnx --no-restore --configuration Release
-
+      
       - name: Run tests
+        working-directory: ./backend
         run: dotnet test Medd.slnx --no-build --configuration Release
 
   check-formatting:
